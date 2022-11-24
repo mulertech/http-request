@@ -4,7 +4,7 @@
 namespace mtphp\HttpRequest\Session;
 
 
-use mtphp\ArrayManipulation\ArrayManipulation;
+use MulerTech\ArrayManipulation\ArrayManipulation;
 use RuntimeException;
 
 /**

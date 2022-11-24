@@ -2,7 +2,7 @@
 
 namespace mtphp\HttpRequest;
 
-use mtphp\CharManipulation\CharManipulation;
+use MulerTech\CharManipulation\CharManipulation;
 
 /**
  * Class HttpRequest
