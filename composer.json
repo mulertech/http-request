@@ -1,0 +1,24 @@
+{
+  "name": "mulertech/http-request",
+  "description": "This package manage http requests",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Sébastien Muler",
+      "email": "sebastien.muler@mulertech.net"
+    }
+  ],
+  "require": {
+    "php": ">=7.4",
+    "guzzlehttp/psr7": "^2",
+    "mulertech/array-manipulation": "^1",
+    "mulertech/char-manipulation": "^1",
+    "psr/http-message": "^2"
+  },
+  "autoload": {
+    "psr-4": {
+      "MulerTech\\HttpRequest\\": "./"
+    }
+  }
+}

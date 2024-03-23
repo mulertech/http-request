@@ -1,15 +1,13 @@
 <?php
 
-
-namespace mtphp\HttpRequest\Session;
-
+namespace MulerTech\HttpRequest\Session;
 
 use MulerTech\ArrayManipulation\ArrayManipulation;
 use RuntimeException;
 
 /**
  * Class Session
- * @package mtphp\HttpRequest\Session
+ * @package MulerTech\HttpRequest\Session
  * @author Sébastien Muler
  */
 class Session

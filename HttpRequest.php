@@ -1,12 +1,12 @@
 <?php
 
-namespace mtphp\HttpRequest;
+namespace MulerTech\HttpRequest;
 
 use MulerTech\CharManipulation\CharManipulation;
 
 /**
  * Class HttpRequest
- * @package mtphp\HttpRequest
+ * @package MulerTech\HttpRequest
  * @author Sébastien Muler
  */
 class HttpRequest

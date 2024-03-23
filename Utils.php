@@ -1,6 +1,6 @@
 <?php
 
-namespace mtphp\HttpRequest;
+namespace MulerTech\HttpRequest;
 
 use GuzzleHttp\Psr7\PumpStream;
 use GuzzleHttp\Psr7\Stream;

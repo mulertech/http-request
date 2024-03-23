@@ -1,13 +1,13 @@
 <?php
 
-namespace mtphp\HttpRequest\Tests;
+namespace MulerTech\HttpRequest\Tests;
 
 //Start session before use the class
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-use mtphp\HttpRequest\Session\Session;
+use MulerTech\HttpRequest\Session\Session;
 use PHPUnit\Framework\TestCase;
 
 /**

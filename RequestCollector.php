@@ -1,14 +1,14 @@
 <?php
 
 
-namespace mtphp\HttpRequest;
+namespace MulerTech\HttpRequest;
 
 
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class RequestCollector
- * @package mtphp\HttpRequest
+ * @package MulerTech\HttpRequest
  * @author Sébastien Muler
  */
 class RequestCollector
