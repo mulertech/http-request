@@ -16,7 +16,7 @@ class HttpRequest
      * @param string $key
      * @return string|null
      */
-    public static function cookieData(string $key): ?string
+    public static function getCookie(string $key): ?string
     {
         return isset($_COOKIE[$key]) ? CharManipulation::specialCharsTrim($_COOKIE[$key]) : null;
     }
@@ -25,7 +25,7 @@ class HttpRequest
      * @param string $key
      * @return bool
      */
-    public static function cookieExists(string $key): bool
+    public static function hasCookie(string $key): bool
     {
         return isset($_COOKIE[$key]);
     }
@@ -34,7 +34,7 @@ class HttpRequest
      * @param string $key
      * @return string|null
      */
-    public static function getData(string $key): ?string
+    public static function get(string $key): ?string
     {
         return isset($_GET[$key]) ? CharManipulation::specialCharsTrim($_GET[$key]) : null;
     }
@@ -43,7 +43,7 @@ class HttpRequest
      * @param string $key
      * @return bool
      */
-    public static function getExists(string $key): bool
+    public static function has(string $key): bool
     {
         return isset($_GET[$key]);
     }
@@ -60,7 +60,7 @@ class HttpRequest
      * @param string $key
      * @return string|null
      */
-    public static function postData(string $key): ?string
+    public static function getPost(string $key): ?string
     {
         return isset($_POST[$key]) ? CharManipulation::specialCharsTrim($_POST[$key]) : null;
     }
@@ -69,7 +69,7 @@ class HttpRequest
      * @param string $key
      * @return bool
      */
-    public static function postExists(string $key): bool
+    public static function hasPost(string $key): bool
     {
         return isset($_POST[$key]);
     }
@@ -77,7 +77,7 @@ class HttpRequest
     /**
      * @return string
      */
-    public static function requestURI(): string
+    public static function getUri(): string
     {
         return $_SERVER['REQUEST_URI'];
     }
@@ -91,11 +91,9 @@ class HttpRequest
         $url = $_SERVER['PHP_SELF'];
         $i = 0;
         foreach ($_GET as $key => $value) {
-            $url .= ($i++ === 0 ? '?' : '&') . CharManipulation::specialCharsTrim(
-                    $key
-                ) . (CharManipulation::specialCharsTrim($value) ? '=' . CharManipulation::specialCharsTrim(
-                        $value
-                    ) : '');
+            $url .= ($i++ === 0 ? '?' : '&') .
+                CharManipulation::specialCharsTrim($key) .
+                (CharManipulation::specialCharsTrim($value) ? '=' . CharManipulation::specialCharsTrim($value) : '');
         }
         return $url;
     }
@@ -121,7 +119,7 @@ class HttpRequest
     /**
      * @return array
      */
-    public static function postListArray(): array
+    public static function getPostList(): array
     {
         $posts_secure = [];
         foreach ($_POST as $post_insecure => $value_insecure) {
@@ -136,7 +134,7 @@ class HttpRequest
     /**
      * @return array
      */
-    public static function getListArray(): array
+    public static function getList(): array
     {
         $gets_secure = [];
         foreach ($_GET as $get_insecure => $value_insecure) {

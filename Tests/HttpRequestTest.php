@@ -2,24 +2,31 @@
 
 namespace MulerTech\HttpRequest\Tests;
 
-//Start session before use the class
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
+use MulerTech\HttpRequest\HttpRequest;
+use MulerTech\HttpRequest\RequestCollector;
+use MulerTech\HttpRequest\ServerRequest;
 use MulerTech\HttpRequest\Session\Session;
+use MulerTech\HttpRequest\Utils;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class SessionTest
  * @package Tests
  * @author Sébastien Muler
  */
-class SessionTest extends TestCase
+class HttpRequestTest extends TestCase
 {
+    private function sessionStart(): void
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+    }
 
     public function testGetSession(): void
     {
+        $this->sessionStart();
         $_SESSION['test'] = 'one test';
         $session = new Session();
         self::assertEquals('one test', $session->get('test'));
@@ -27,9 +34,10 @@ class SessionTest extends TestCase
 
     public function testHasSession(): void
     {
+        $this->sessionStart();
         $_SESSION['test'] = 'one test';
         $session = new Session();
-        self::assertEquals(true, $session->has('test'));
+        self::assertTrue($session->has('test'));
     }
 
     public function testSetSession(): void
@@ -41,14 +49,16 @@ class SessionTest extends TestCase
 
     public function testDeleteSession(): void
     {
+        $this->sessionStart();
         $_SESSION['test'] = 'one test';
         $session = new Session();
         $session->delete('test');
-        self::assertEquals(false, $session->has('test'));
+        self::assertFalse($session->has('test'));
     }
 
     public function testAddWithValueExistsSession(): void
     {
+        $this->sessionStart();
         $session = new Session();
         $_SESSION['test'] = [
             'subtest1' => [
@@ -95,6 +105,7 @@ class SessionTest extends TestCase
 
     public function testAddWithValueExistsOnArraySession(): void
     {
+        $this->sessionStart();
         $session = new Session();
         $_SESSION['test'] = [
             'subtest1' => [
@@ -142,6 +153,7 @@ class SessionTest extends TestCase
 
     public function testAddValueInSequentialArrayWithValueExistsOnArraySession(): void
     {
+        $this->sessionStart();
         $session = new Session();
         $_SESSION['test'] = [
             'subtest1' => [
@@ -189,6 +201,7 @@ class SessionTest extends TestCase
 
     public function testRemoveKeyWithValueExistsOnArraySession(): void
     {
+        $this->sessionStart();
         $session = new Session();
         $_SESSION['test'] = [
             'subtest1' => [
@@ -233,4 +246,119 @@ class SessionTest extends TestCase
         self::assertEquals($expected, $session->get('test'));
     }
 
+    public function testGetCookie(): void
+    {
+        $_COOKIE['test'] = 'one test';
+        self::assertEquals('one test', HttpRequest::getCookie('test'));
+    }
+
+    public function testCookieExists(): void
+    {
+        $_COOKIE['test'] = 'one test';
+        self::assertTrue(HttpRequest::hasCookie('test'));
+    }
+
+    public function testGetData(): void
+    {
+        $_GET['test'] = 'one test';
+        self::assertEquals('one test', HttpRequest::get('test'));
+    }
+
+    public function testGetExists(): void
+    {
+        $_GET['test'] = 'one test';
+        self::assertTrue(HttpRequest::has('test'));
+    }
+
+    public function testMethod(): void
+    {
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        self::assertEquals('GET', HttpRequest::method());
+    }
+
+    public function testPostData(): void
+    {
+        $_POST['test'] = 'one test';
+        self::assertEquals('one test', HttpRequest::getPost('test'));
+    }
+
+    public function testPostExists(): void
+    {
+        $_POST['test'] = 'one test';
+        self::assertTrue(HttpRequest::hasPost('test'));
+    }
+
+    public function testRequestUri(): void
+    {
+        $_SERVER['REQUEST_URI'] = '/test';
+        self::assertEquals('/test', HttpRequest::getUri());
+    }
+
+    public function testGetUrlWithOptions(): void
+    {
+        $_SERVER['PHP_SELF'] = '/test';
+        $_GET['test'] = 'one';
+        $_GET['test2'] = 'two';
+        self::assertEquals('/test?test=one&test2=two', HttpRequest::getUrl());
+    }
+
+    public function testGetUrlWithoutOptions(): void
+    {
+        $_SERVER['PHP_SELF'] = '/test';
+        $_GET = [];
+        self::assertEquals('/test', HttpRequest::getUrl());
+    }
+
+    public function testPostListString(): void
+    {
+        $_POST['test'] = 'one';
+        $_POST['test2'] = 'two';
+        self::assertEquals('test:one,test2:two', HttpRequest::postListString());
+    }
+
+    public function testPostListArray(): void
+    {
+        $_POST['test'] = 'one';
+        $_POST['test2'] = 'two';
+        self::assertEquals(['test' => 'one', 'test2' => 'two'], HttpRequest::getPostList());
+    }
+
+    public function testGetListArray(): void
+    {
+        $_GET['test'] = 'one';
+        $_GET['test2'] = 'two';
+        self::assertEquals(['test' => 'one', 'test2' => 'two'], HttpRequest::getList());
+    }
+
+    public function testPushRequest(): void
+    {
+        $requestCollector = new RequestCollector();
+        $requestCollector->push(ServerRequest::fromGlobals());
+        self::assertInstanceOf(ServerRequestInterface::class, $requestCollector->getCurrentRequest());
+    }
+
+    public function testCurrentRequestWithEmptyRequestCollector(): void
+    {
+        $requestCollector = new RequestCollector();
+        self::assertNull($requestCollector->getCurrentRequest());
+    }
+
+    public function testPopRequest(): void
+    {
+        $requestCollector = new RequestCollector();
+        $requestCollector->push(ServerRequest::fromGlobals());
+        self::assertInstanceOf(ServerRequestInterface::class, $requestCollector->pop());
+    }
+
+    public function testPopRequestWithEmptyRequestCollector(): void
+    {
+        $requestCollector = new RequestCollector();
+        self::assertNull($requestCollector->pop());
+    }
+
+    public function testStreamFor(): void
+    {
+        $stream = Utils::streamFor('test');
+        self::assertEquals('test', $stream->getContents());
+    }
 }

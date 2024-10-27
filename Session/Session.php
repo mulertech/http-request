@@ -12,13 +12,11 @@ use RuntimeException;
  */
 class Session
 {
-
-
     /**
      * @param string ...$index List of index : one per argument.
      * @return mixed|null
      */
-    public function get(string ...$index)
+    public function get(string ...$index): mixed
     {
         if (!$this->sessionStarted()) {
             return null;
@@ -74,7 +72,7 @@ class Session
      * @param string $key
      * @param mixed $value
      */
-    public function set(string $key, $value): void
+    public function set(string $key, mixed $value): void
     {
         if (!$this->sessionStarted()) {
             session_start();
@@ -116,17 +114,24 @@ class Session
      */
     public function delete(string ...$index): void
     {
-        if ($this->sessionStarted()) {
-            if (count($index) > 1) {
-                $sessionIndex = array_shift($index);
-                if ($this->has($sessionIndex)) {
-                    $data = $this->get($sessionIndex);
-                    $newData = ArrayManipulation::removeKey(...array_merge([$data], $index));
-                    $this->set($sessionIndex, $newData);
-                }
-            } elseif ($this->has($index[0])) {
-                unset($_SESSION[$index[0]]);
+        if (!$this->sessionStarted()) {
+            return;
+        }
+
+        if (count($index) > 1) {
+            $sessionIndex = array_shift($index);
+
+            if ($this->has($sessionIndex)) {
+                $data = $this->get($sessionIndex);
+                $newData = ArrayManipulation::removeKey(...array_merge([$data], $index));
+                $this->set($sessionIndex, $newData);
             }
+
+            return;
+        }
+
+        if ($this->has($index[0])) {
+            unset($_SESSION[$index[0]]);
         }
     }
 

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace MulerTech\HttpRequest;
-
 
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -13,11 +11,10 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class RequestCollector
 {
-
     /**
      * @var ServerRequestInterface[]
      */
-    private $requests = [];
+    private array $requests = [];
 
     /**
      * @param ServerRequestInterface $request
