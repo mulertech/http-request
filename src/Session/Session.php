@@ -98,6 +98,10 @@ class Session
         $firstIndex = array_shift($index);
         $data = $this->get($firstIndex);
 
+        if (is_string($data)) {
+            $data = [$data];
+        }
+
         $this->set($firstIndex, ArrayManipulation::addKeyValue($data, $key, $value, ...$index));
     }
 

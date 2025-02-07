@@ -81,6 +81,15 @@ class HttpRequestTest extends TestCase
         $session->add('key', 'value');
     }
 
+    public function testAddWithStringValueForFirstIndex(): void
+    {
+        $this->sessionStart();
+        $session = new Session();
+        $_SESSION['test'] = 'one test';
+        $session->add('key', 'value', 'test');
+        self::assertEquals('value', $session->get('test', 'key'));
+    }
+
     public function testAddWithValueExistsSession(): void
     {
         $this->sessionStart();
