@@ -28,20 +28,33 @@ class HttpRequestTest extends TestCase
     {
         $this->sessionStart();
         $_SESSION['test'] = 'one test';
+        $_SESSION['secondtest'] = ['subtest' => 'subtest value'];
+        $_SESSION['thirdtest'] = ['subtest' => ['subsubtest' => 'subtest value']];
         $session = new Session();
+        self::assertNull($session->get());
+        self::assertNull($session->get('nope'));
         self::assertEquals('one test', $session->get('test'));
+        self::assertEquals('subtest value', $session->get('secondtest', 'subtest'));
+        self::assertNull($session->get('thirdtest', 'subtest', 'nope'));
     }
 
     public function testHasSession(): void
     {
         $this->sessionStart();
         $_SESSION['test'] = 'one test';
+        $_SESSION['secondtest'] = ['subtest' => 'subtest value'];
+        $_SESSION['thirdtest'] = ['subtest' => ['subsubtest' => 'subtest value']];
         $session = new Session();
+        self::assertFalse($session->has());
+        self::assertFalse($session->has('nope'));
         self::assertTrue($session->has('test'));
+        self::assertTrue($session->has('secondtest', 'subtest'));
+        self::assertFalse($session->has('thirdtest', 'subtest', 'nope'));
     }
 
     public function testSetSession(): void
     {
+        session_write_close();
         $session = new Session();
         $session->set('test', 'one test');
         self::assertEquals('one test', $session->get('test'));
@@ -54,6 +67,18 @@ class HttpRequestTest extends TestCase
         $session = new Session();
         $session->delete('test');
         self::assertFalse($session->has('test'));
+        // Do nothing just for code coverage
+        $session->delete();
+    }
+
+    public function testAddSessionWithoutIndex(): void
+    {
+        $this->sessionStart();
+        $session = new Session();
+        $this->expectExceptionMessage(
+            'Class Session, function add. The index parameter (third parameter) is required.'
+        );
+        $session->add('key', 'value');
     }
 
     public function testAddWithValueExistsSession(): void
@@ -248,8 +273,9 @@ class HttpRequestTest extends TestCase
 
     public function testGetCookie(): void
     {
-        $_COOKIE['test'] = 'one test';
+        $_COOKIE['test'] = '<script>one test</script>';
         self::assertEquals('one test', HttpRequest::getCookie('test'));
+        self::assertNull(HttpRequest::getCookie('nope'));
     }
 
     public function testCookieExists(): void
@@ -260,8 +286,9 @@ class HttpRequestTest extends TestCase
 
     public function testGetData(): void
     {
-        $_GET['test'] = 'one test';
+        $_GET['test'] = '<script>one test</script>';
         self::assertEquals('one test', HttpRequest::get('test'));
+        self::assertNull(HttpRequest::get('nope'));
     }
 
     public function testGetExists(): void
@@ -278,8 +305,9 @@ class HttpRequestTest extends TestCase
 
     public function testPostData(): void
     {
-        $_POST['test'] = 'one test';
+        $_POST['test'] = '<script>one test</script>';
         self::assertEquals('one test', HttpRequest::getPost('test'));
+        self::assertNull(HttpRequest::getPost('nope'));
     }
 
     public function testPostExists(): void
@@ -298,7 +326,7 @@ class HttpRequestTest extends TestCase
     {
         $_SERVER['PHP_SELF'] = '/test';
         $_GET['test'] = 'one';
-        $_GET['test2'] = 'two';
+        $_GET['test2'] = '<script>two</script>';
         self::assertEquals('/test?test=one&test2=two', HttpRequest::getUrl());
     }
 
@@ -312,21 +340,21 @@ class HttpRequestTest extends TestCase
     public function testPostListString(): void
     {
         $_POST['test'] = 'one';
-        $_POST['test2'] = 'two';
+        $_POST['test2'] = '<script>two</script>';
         self::assertEquals('test:one,test2:two', HttpRequest::postListString());
     }
 
     public function testPostListArray(): void
     {
         $_POST['test'] = 'one';
-        $_POST['test2'] = 'two';
+        $_POST['test2'] = '<script>two</script>';
         self::assertEquals(['test' => 'one', 'test2' => 'two'], HttpRequest::getPostList());
     }
 
     public function testGetListArray(): void
     {
         $_GET['test'] = 'one';
-        $_GET['test2'] = 'two';
+        $_GET['test2'] = '<script>two</script>';
         self::assertEquals(['test' => 'one', 'test2' => 'two'], HttpRequest::getList());
     }
 
