@@ -3,17 +3,17 @@
 namespace MulerTech\HttpRequest\Session;
 
 use MulerTech\ArrayManipulation\ArrayManipulation;
-use RuntimeException;
 
 /**
- * Class Session
- * @package MulerTech\HttpRequest\Session
+ * Class Session.
+ *
  * @author Sébastien Muler
  */
 class Session
 {
     /**
      * @param string ...$index List of index : one per argument.
+     *
      * @return mixed|null
      */
     public function get(string ...$index): mixed
@@ -29,7 +29,7 @@ class Session
 
         $data = $_SESSION[$key];
         foreach ($index as $arg) {
-            if (isset($data[$arg])) {
+            if (is_array($data) && isset($data[$arg])) {
                 $data = $data[$arg];
                 continue;
             }
@@ -42,7 +42,6 @@ class Session
 
     /**
      * @param string ...$index List of index : one per argument.
-     * @return bool
      */
     public function has(string ...$index): bool
     {
@@ -57,7 +56,7 @@ class Session
 
         $data = $_SESSION[$key];
         foreach ($index as $arg) {
-            if (isset($data[$arg])) {
+            if (is_array($data) && isset($data[$arg])) {
                 $data = $data[$arg];
                 continue;
             }
@@ -68,10 +67,6 @@ class Session
         return true;
     }
 
-    /**
-     * @param string $key
-     * @param mixed $value
-     */
     public function set(string $key, mixed $value): void
     {
         if (!$this->sessionStarted()) {
@@ -82,17 +77,12 @@ class Session
     }
 
     /**
-     * Add a key and its value onto a $_SESSION[$index][otherindex][andotherindex]...[$key] = $value
-     * @param string $key
-     * @param mixed $value
-     * @param string ...$index
+     * Add a key and its value onto a $_SESSION[$index][otherindex][andotherindex]...[$key] = $value.
      */
     public function add(string $key, mixed $value, string ...$index): void
     {
         if (empty($index)) {
-            throw new RuntimeException(
-                'Class Session, function add. The index parameter (third parameter) is required.'
-            );
+            throw new \RuntimeException('Class Session, function add. The index parameter (third parameter) is required.');
         }
 
         $firstIndex = array_shift($index);
@@ -100,15 +90,17 @@ class Session
 
         if (is_string($data)) {
             $this->set($firstIndex, [$key => $value]);
+
             return;
+        }
+
+        if (!is_array($data)) {
+            $data = [];
         }
 
         $this->set($firstIndex, ArrayManipulation::addKeyValue($data, $key, $value, ...$index));
     }
 
-    /**
-     * @param string ...$index
-     */
     public function delete(string ...$index): void
     {
         if (empty($index) || !$this->sessionStarted()) {
@@ -118,22 +110,21 @@ class Session
         $sessionIndex = array_shift($index);
         if (empty($index)) {
             unset($_SESSION[$sessionIndex]);
+
             return;
         }
 
         if ($this->has($sessionIndex)) {
             $data = $this->get($sessionIndex);
-            $newData = ArrayManipulation::removeKey($data, ...$index);
-            $this->set($sessionIndex, $newData);
+            if (is_array($data)) {
+                $newData = ArrayManipulation::removeKey($data, ...$index);
+                $this->set($sessionIndex, $newData);
+            }
         }
     }
 
-    /**
-     * @return bool
-     */
     private function sessionStarted(): bool
     {
-        return session_status() === PHP_SESSION_ACTIVE;
+        return PHP_SESSION_ACTIVE === session_status();
     }
-
 }

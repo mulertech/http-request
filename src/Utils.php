@@ -10,9 +10,7 @@ use Psr\Http\Message\StreamInterface;
 class Utils
 {
     /**
-     * @param string $resource
-     * @param array<string, mixed> $options
-     * @return PumpStream|Stream|StreamInterface
+     * @param array{size?: int, metadata?: array<string, mixed>} $options
      */
     public static function streamFor(string $resource = '', array $options = []): PumpStream|Stream|StreamInterface
     {

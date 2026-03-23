@@ -5,70 +5,54 @@ namespace MulerTech\HttpRequest;
 use MulerTech\CharManipulation\CharManipulation;
 
 /**
- * Class HttpRequest
- * @package MulerTech\HttpRequest
+ * Class HttpRequest.
+ *
  * @author Sébastien Muler
  */
 class HttpRequest
 {
-    /**
-     * @param string $key
-     * @return string|null
-     */
-    public static function getCookie(string $key): string|null
+    public static function getCookie(string $key): ?string
     {
         if (!isset($_COOKIE[$key])) {
             return null;
         }
 
-        /** @var string $cookie For PHPStan */
-        $cookie = CharManipulation::specialCharsTrim($_COOKIE[$key]);
-        return $cookie;
+        $raw = $_COOKIE[$key];
+        $result = CharManipulation::specialCharsTrim(is_string($raw) || is_array($raw) ? $raw : null);
+
+        return is_string($result) ? $result : null;
     }
 
-    /**
-     * @param string $key
-     * @return bool
-     */
     public static function hasCookie(string $key): bool
     {
         return isset($_COOKIE[$key]);
     }
 
-    /**
-     * @param string $key
-     * @return string|null
-     */
-    public static function get(string $key): string|null
+    public static function get(string $key): ?string
     {
         if (!isset($_GET[$key])) {
             return null;
         }
 
-        /** @var string $get For PHPStan */
-        $get = CharManipulation::specialCharsTrim($_GET[$key]);
-        return $get;
+        $raw = $_GET[$key];
+        $result = CharManipulation::specialCharsTrim(is_string($raw) || is_array($raw) ? $raw : null);
+
+        return is_string($result) ? $result : null;
     }
 
-    /**
-     * @param string $key
-     * @return bool
-     */
     public static function has(string $key): bool
     {
         return isset($_GET[$key]);
     }
 
-    /**
-     * @return string
-     */
     public static function method(): string
     {
-        return $_SERVER['REQUEST_METHOD'];
+        $method = $_SERVER['REQUEST_METHOD'];
+
+        return is_string($method) ? $method : '';
     }
 
     /**
-     * @param string $key
      * @return string|array<int|string, mixed>|null
      */
     public static function getPost(string $key): string|array|null
@@ -77,54 +61,50 @@ class HttpRequest
             return null;
         }
 
-        /** @var string $post For PHPStan */
-        $post = CharManipulation::specialCharsTrim($_POST[$key]);
-        return $post;
+        $raw = $_POST[$key];
+
+        return CharManipulation::specialCharsTrim(is_string($raw) || is_array($raw) ? $raw : null);
     }
 
-    /**
-     * @param string $key
-     * @return bool
-     */
     public static function hasPost(string $key): bool
     {
         return isset($_POST[$key]);
     }
 
-    /**
-     * @return string
-     */
     public static function getUri(): string
     {
-        return $_SERVER['REQUEST_URI'];
+        $uri = $_SERVER['REQUEST_URI'];
+
+        return is_string($uri) ? $uri : '';
     }
 
     /**
-     * get url with get options
-     * @return string
+     * get url with get options.
      */
     public static function getUrl(): string
     {
-        $url = $_SERVER['PHP_SELF'];
-        $query = http_build_query(array_map([CharManipulation::class, 'specialCharsTrim'], $_GET));
-        return $query ? $url . '?' . $query : $url;
+        $phpSelf = $_SERVER['PHP_SELF'];
+        $url = is_string($phpSelf) ? $phpSelf : '';
+        $query = http_build_query(array_map(
+            static fn (mixed $v): string|array|null => CharManipulation::specialCharsTrim(
+                is_string($v) || is_array($v) ? $v : null
+            ),
+            $_GET
+        ));
+
+        return $query ? $url.'?'.$query : $url;
     }
 
-    /**
-     * @return string
-     */
     public static function postListString(): string
     {
         $posts = $_POST;
         $postsKeyValues = [];
 
-        array_walk($posts, static function ($value, $key) use (&$postsKeyValues) {
-            /** @var string $key For PHPStan */
-            $key = CharManipulation::specialCharsTrim($key);
-            /** @var string $value For PHPStan */
-            $value = CharManipulation::specialCharsTrim($value);
+        array_walk($posts, static function (mixed $value, string $key) use (&$postsKeyValues) {
+            $trimmedKey = CharManipulation::specialCharsTrim($key);
+            $trimmedValue = CharManipulation::specialCharsTrim(is_string($value) || is_array($value) ? $value : null);
 
-            $postsKeyValues[] = sprintf('%s:%s', $key, $value);
+            $postsKeyValues[] = sprintf('%s:%s', is_string($trimmedKey) ? $trimmedKey : '', is_string($trimmedValue) ? $trimmedValue : '');
         });
 
         return implode(',', $postsKeyValues);
@@ -138,13 +118,11 @@ class HttpRequest
         $posts = $_POST;
         $postList = [];
 
-        array_walk($posts, static function ($value, $key) use (&$postList) {
-            /** @var string $key For PHPStan */
-            $key = CharManipulation::specialCharsTrim($key);
-            /** @var string $value For PHPStan */
-            $value = CharManipulation::specialCharsTrim($value);
+        array_walk($posts, static function (mixed $value, string $key) use (&$postList) {
+            $trimmedKey = CharManipulation::specialCharsTrim($key);
+            $trimmedValue = CharManipulation::specialCharsTrim(is_string($value) || is_array($value) ? $value : null);
 
-            $postList[$key] = $value;
+            $postList[is_string($trimmedKey) ? $trimmedKey : ''] = is_string($trimmedValue) ? $trimmedValue : '';
         });
 
         return $postList;
@@ -158,13 +136,11 @@ class HttpRequest
         $gets = $_GET;
         $getsList = [];
 
-        array_walk($gets, static function ($value, $key) use (&$getsList) {
-            /** @var string $key For PHPStan */
-            $key = CharManipulation::specialCharsTrim($key);
-            /** @var string $value For PHPStan */
-            $value = CharManipulation::specialCharsTrim($value);
+        array_walk($gets, static function (mixed $value, string $key) use (&$getsList) {
+            $trimmedKey = CharManipulation::specialCharsTrim($key);
+            $trimmedValue = CharManipulation::specialCharsTrim(is_string($value) || is_array($value) ? $value : null);
 
-            $getsList[$key] = $value;
+            $getsList[is_string($trimmedKey) ? $trimmedKey : ''] = is_string($trimmedValue) ? $trimmedValue : '';
         });
 
         return $getsList;
