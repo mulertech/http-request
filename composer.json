@@ -2,7 +2,12 @@
   "name": "mulertech/http-request",
   "description": "This package manage http requests",
   "type": "library",
-  "keywords": ["php", "http", "request", "psr-7"],
+  "keywords": [
+    "php",
+    "http",
+    "request",
+    "psr-7"
+  ],
   "minimum-stability": "stable",
   "license": "MIT",
   "authors": [
@@ -12,27 +17,30 @@
     }
   ],
   "require": {
-    "php": "^8.3",
+    "php": "^8.4",
     "guzzlehttp/psr7": "^2",
     "mulertech/array-manipulation": "^2",
     "mulertech/char-manipulation": "^1",
     "psr/http-message": "^2"
   },
-    "require-dev": {
-      "friendsofphp/php-cs-fixer": "^3.6",
-      "mulertech/docker-dev": "^3.2",
-      "phpstan/phpstan": "^2.1",
-      "phpunit/phpunit": "^12",
-      "roave/security-advisories": "dev-latest"
-    },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^3.6",
+    "mulertech/docker-dev": "^3.2",
+    "phpstan/phpstan": "^2.1",
+    "phpunit/phpunit": "^12",
+    "roave/security-advisories": "dev-latest"
+  },
   "autoload": {
     "psr-4": {
       "MulerTech\\HttpRequest\\": "./src"
     }
   },
   "autoload-dev": {
-      "psr-4": {
+    "psr-4": {
       "MulerTech\\HttpRequest\\Tests\\": "./tests"
-      }
+    }
+  },
+  "config": {
+    "sort-packages": true
   }
 }
